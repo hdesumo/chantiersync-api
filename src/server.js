@@ -1,8 +1,14 @@
-import express from 'express';
 import 'dotenv/config';
-
-const app = express();
-app.get('/', (req,res)=>res.send('ChantierSync API ready'));
+import app from './app.js';
+import { sequelize } from './sequelize/index.js';
 
 const port = process.env.PORT || 8080;
-app.listen(port, ()=>console.log('API listening on', port));
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('DB connected');
+  } catch (e) {
+    console.error('DB connection failed:', e.message);
+  }
+  app.listen(port, () => console.log(`API listening on :${port}`));
+})();
