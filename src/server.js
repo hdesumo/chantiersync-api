@@ -1,13 +1,8 @@
-import express from "express";
-import sequelize from "./db.js"; // <-- notre nouvelle instance Sequelize
-import routes from "./routes/index.js";
-
-const app = express();
+// src/server.js
+import app from "./app.js";
+import sequelize from "./db.js";
 
 const PORT = process.env.PORT || 8080;
-
-app.use(express.json());
-app.use("/api", routes);
 
 sequelize.authenticate()
   .then(() => {
