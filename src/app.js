@@ -3,21 +3,27 @@ import routes from './routes/index.js';
 
 const app = express();
 
-// ✅ Parse le JSON AVANT de monter les routes
+// ✅ Middleware globaux
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Healthcheck direct (utile pour Railway)
+// ✅ Healthcheck direct
 app.get('/healthz', (_req, res) => {
   res.json({ ok: true, service: 'api', ts: new Date().toISOString() });
 });
 
-// ⚠️ doit rester tout en bas
+// ✅ Ping direct
+app.get('/ping', (_req, res) => {
+  res.json({ pong: true, ts: new Date().toISOString() });
+});
+
+// ✅ Routes principales montées sous /api
+app.use('/api', routes);
+
+// ✅ Middleware d'erreurs tout en bas
 app.use((err, _req, res, _next) => {
   console.error('🧨 Unhandled error:', err);
   res.status(500).json({ message: 'Internal server error' });
 });
-
-app.use('/api', routes);
 
 export default app;
