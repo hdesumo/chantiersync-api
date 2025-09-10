@@ -5,20 +5,22 @@ export default {
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
     dialectOptions: {
-      ssl: process.env.DATABASE_SSL === 'true'
-        ? { require: true, rejectUnauthorized: false }
-        : false
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // 🔑 accepte le certificat auto-signé
+      },
     },
-    logging: false
+    logging: false,
   },
   production: {
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
     dialectOptions: {
-      ssl: process.env.DATABASE_SSL === 'true'
-        ? { require: true, rejectUnauthorized: false }
-        : false
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // 🔑 accepte le certificat auto-signé
+      },
     },
-    logging: false
+    logging: false,
   }
 };
