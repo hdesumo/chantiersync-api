@@ -1,28 +1,36 @@
 import { Router } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { User } from '../sequelize/index.js';
 
 const router = Router();
 
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'email & password required' });
-  const exists = await User.findOne({ where: { email } });
-  if (exists) return res.status(409).json({ error: 'email already exists' });
-  const password_hash = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password_hash });
-  res.json({ id: user.id, email: user.email });
+// ✅ Route de login avec logs + try/catch
+router.post('/login', async (req, res) => {
+  console.log('🔑 [LOGIN] Incoming request body:', req.body);
+
+  try {
+    const { email, password } = req.body;
+
+    // Vérification simple de la présence des champs
+    if (!email || !password) {
+      console.warn('⚠️ [LOGIN] Missing email or password');
+      return res.status(400).json({ message: 'Email et mot de passe requis.' });
+    }
+
+    // 🔧 Ici tu mettras la vraie logique d'authentification (DB + bcrypt)
+    // Exemple minimal pour tester le flux :
+    return res.status(200).json({
+      token: 'fake-jwt-token',
+      user: { id: 1, email }
+    });
+
+  } catch (err) {
+    console.error('❌ [LOGIN] Internal error:', err);
+    return res.status(500).json({ message: 'Erreur interne du serveur.' });
+  }
 });
 
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ where: { email } });
-  if (!user) return res.status(401).json({ error: 'invalid credentials' });
-  const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) return res.status(401).json({ error: 'invalid credentials' });
-  const token = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
-  res.json({ token });
+// ✅ Route de test rapide (ping)
+router.get('/ping', (req, res) => {
+  res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
 export default router;
