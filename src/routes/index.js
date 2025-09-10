@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import authRoutes from './auth.js';
-import projectRoutes from './projects.js';
+// importe d'autres routes si besoin
 
 const router = Router();
+
+// ✅ ping sur /api/ping
+router.get('/ping', (_req, res) => {
+  res.json({ ok: true, ts: new Date().toISOString() });
+});
+
 router.use('/auth', authRoutes);
-router.use('/projects', projectRoutes);
+
 export default router;
