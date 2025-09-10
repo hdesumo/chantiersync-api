@@ -17,6 +17,11 @@ app.get('/ping', (_req, res) => {
   res.json({ pong: true, ts: new Date().toISOString() });
 });
 
+// ✅ Ping direct
+app.get('/ping', (_req, res) => {
+  res.json({ pong: true, ts: new Date().toISOString() });
+});
+
 // ✅ Routes principales montées sous /api
 app.use('/api', routes);
 
