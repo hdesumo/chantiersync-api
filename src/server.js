@@ -1,17 +1,20 @@
-// src/server.js
-import app from "./app.js";
-import sequelize from "./db.js";
+import app from './app.js';
+import sequelize from './sequelize/config.js';
 
 const PORT = process.env.PORT || 8080;
 
-sequelize.authenticate()
-  .then(() => {
-    console.log("✅ DB connected successfully");
+(async () => {
+  try {
+    // ✅ Test de connexion DB
+    await sequelize.authenticate();
+    console.log('✅ DB connected successfully');
+
+    // 🚀 Lancer l'API seulement si la DB est OK
     app.listen(PORT, () => {
-      console.log(`API listening on :${PORT}`);
+      console.log(`🚀 API listening on port ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("❌ DB connection failed:", err.message);
-    process.exit(1); // évite de démarrer si DB down
-  });
+  } catch (error) {
+    console.error('❌ Database connection error:', error.message);
+    process.exit(1); // Empêche de démarrer si pas de DB
+  }
+})();
