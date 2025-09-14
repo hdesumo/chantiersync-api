@@ -1,20 +1,28 @@
-import app from './app.js';
-import sequelize from './sequelize/config.js';
+import app from "./app.js";
+import { PrismaClient } from "@prisma/client";
 
-const PORT = process.env.PORT || 8080;
+const prisma = new PrismaClient();
+const PORT = process.env.PORT || 4000;
 
-(async () => {
+async function startServer() {
   try {
-    // ✅ Test de connexion DB
-    await sequelize.authenticate();
-    console.log('✅ DB connected successfully');
+    // Vérifie la connexion PostgreSQL avant de lancer le serveur
+    await prisma.$connect();
+    console.log("✅ Connecté à PostgreSQL avec succès");
 
-    // 🚀 Lancer l'API seulement si la DB est OK
     app.listen(PORT, () => {
-      console.log(`🚀 API listening on port ${PORT}`);
+      console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Database connection error:', error.message);
-    process.exit(1); // Empêche de démarrer si pas de DB
+    console.error("❌ Impossible de se connecter à la base de données:", error);
+    process.exit(1);
   }
-})();
+}
+
+startServer();
+
+// Pour éviter les fuites de connexion lors de l'arrêt
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});

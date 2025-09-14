@@ -1,0 +1,54 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      String    @default("admin") // admin, agent, superadmin
+  chantiers Chantier[]
+  createdAt DateTime  @default(now())
+}
+
+model Chantier {
+  id        Int       @id @default(autoincrement())
+  nom       String
+  adresse   String?
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  rapports  Rapport[]
+  createdAt DateTime  @default(now())
+}
+
+model Rapport {
+  id         Int       @id @default(autoincrement())
+  chantierId Int
+  chantier   Chantier  @relation(fields: [chantierId], references: [id])
+  imageUrl   String
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime  @default(now())
+}
+
+model Feature {
+  id        Int      @id @default(autoincrement())
+  title     String
+  description String
+  createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  author    String
+  role      String
+  quote     String
+  createdAt DateTime @default(now())
+}
+

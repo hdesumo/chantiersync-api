@@ -1,51 +1,41 @@
-import crypto from 'crypto';
-import bcrypt from 'bcryptjs'; // ✅ utilisation de bcryptjs
-import User from '../models/User.js';
+import { prisma } from "../prismaClient.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+export const register = async (req, res) => {
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-    }
+    const { email, password, role } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1h
+    const user = await prisma.user.create({
+      data: { email, password: hashedPassword, role: role || "admin" },
+    });
 
-    await user.update({ resetToken, resetTokenExpiry });
-
-    console.log(`🔑 [DEBUG] Lien de reset : https://ton-frontend/reset-password?token=${resetToken}`);
-
-    return res.json({ message: 'Lien de réinitialisation généré. Vérifiez les logs.' });
-  } catch (err) {
-    console.error('❌ Erreur forgotPassword:', err);
-    return res.status(500).json({ message: 'Erreur interne du serveur.' });
+    res.status(201).json({ message: "Utilisateur créé", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur lors de l'inscription" });
   }
 };
 
-export const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+export const login = async (req, res) => {
   try {
-    const user = await User.findOne({ where: { resetToken: token } });
-    if (!user) {
-      return res.status(400).json({ message: 'Token invalide.' });
-    }
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (new Date() > user.resetTokenExpiry) {
-      return res.status(400).json({ message: 'Token expiré.' });
-    }
+    if (!user) return res.status(401).json({ error: "Utilisateur non trouvé" });
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await user.update({
-      password: hashedPassword,
-      resetToken: null,
-      resetTokenExpiry: null,
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid)
+      return res.status(401).json({ error: "Mot de passe incorrect" });
+
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
     });
 
-    return res.json({ message: 'Mot de passe mis à jour avec succès.' });
-  } catch (err) {
-    console.error('❌ Erreur resetPassword:', err);
-    return res.status(500).json({ message: 'Erreur interne du serveur.' });
+    res.json({ message: "Connexion réussie", token, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur lors de la connexion" });
   }
 };

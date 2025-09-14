@@ -1,14 +1,31 @@
-import { Router } from 'express';
-import authRoutes from './authRoutes.js'; // ✅ corrige le chemin
+import express from "express";
+import { register, login } from "../controllers/auth.controller.js";
+import { getDashboardStats } from "../controllers/dashboard.controller.js";
+import {
+  getChantiers,
+  createChantier,
+  updateChantier,
+  deleteChantier,
+} from "../controllers/chantiers.controller.js";
+import { getRapports, createRapport } from "../controllers/rapports.controller.js";
 
-const router = Router();
+const router = express.Router();
 
-// ✅ ping sur /api/ping
-router.get('/ping', (_req, res) => {
-  res.json({ ok: true, ts: new Date().toISOString() });
-});
+// Auth
+router.post("/register", register);
+router.post("/login", login);
 
-// ✅ monte les routes d'auth
-router.use('/auth', authRoutes);
+// Dashboard
+router.get("/dashboard-stats", getDashboardStats);
+
+// Chantiers
+router.get("/chantiers", getChantiers);
+router.post("/chantiers", createChantier);
+router.put("/chantiers/:id", updateChantier);
+router.delete("/chantiers/:id", deleteChantier);
+
+// Rapports
+router.get("/rapports", getRapports);
+router.post("/rapports", createRapport);
 
 export default router;
