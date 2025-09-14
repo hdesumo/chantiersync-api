@@ -6,6 +6,7 @@ import featureRoutes from "./routes/featureRoutes.js";
 import testimonialRoutes from "./routes/testimonialRoutes.js";
 import adminMessageRoutes from "./routes/adminMessageRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import router from "./routes/index.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/reports", reportRoutes);
 
 // Ajoute ici les autres routes API si existantes
 // ex: app.use("/api/features", featureRoutes);
+app.use("/", router);
 
 // -------------------
 // Middleware 404
