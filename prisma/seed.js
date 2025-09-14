@@ -1,54 +1,57 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🚀 Démarrage du seeding...");
+  console.log("🚀 Lancement du seeding...");
 
   // 1️⃣ Nettoyer les tables (optionnel en dev)
-  await prisma.testimonial.deleteMany();
-  await prisma.feature.deleteMany();
+  await prisma.rapport.deleteMany();
+  await prisma.chantier.deleteMany();
+  await prisma.user.deleteMany();
 
-  // 2️⃣ Insérer quelques features
-  await prisma.feature.createMany({
+  // 2️⃣ Créer un admin
+  const hashedPassword = await bcrypt.hash("password123", 10);
+  const admin = await prisma.user.create({
+    data: {
+      email: "admin@example.com",
+      password: hashedPassword,
+      role: "admin",
+    },
+  });
+  console.log("👤 Admin créé:", admin.email);
+
+  // 3️⃣ Créer un chantier de test
+  const chantier = await prisma.chantier.create({
+    data: {
+      nom: "Chantier de test",
+      adresse: "Dakar Plateau",
+      userId: admin.id,
+    },
+  });
+  console.log("🏗️ Chantier créé:", chantier.nom);
+
+  // 4️⃣ Créer deux rapports liés à ce chantier
+  const rapports = await prisma.rapport.createMany({
     data: [
       {
-        title: "Rapports en temps réel",
-        description: "Suivez vos chantiers en direct et recevez des rapports automatiques sur tous vos appareils.",
+        chantierId: chantier.id,
+        imageUrl: "https://via.placeholder.com/300.png",
+        latitude: 14.6928,
+        longitude: -17.4467,
       },
       {
-        title: "Collaboration simplifiée",
-        description: "Toute l'équipe reste alignée grâce à des mises à jour instantanées et centralisées.",
-      },
-      {
-        title: "Tableau de bord intelligent",
-        description: "Visualisez l'avancement de vos projets en un coup d'œil et anticipez les retards.",
+        chantierId: chantier.id,
+        imageUrl: "https://via.placeholder.com/300.png",
+        latitude: 14.7000,
+        longitude: -17.4500,
       },
     ],
   });
+  console.log(`📝 ${rapports.count} rapports créés`);
 
-  // 3️⃣ Insérer quelques témoignages
-  await prisma.testimonial.createMany({
-    data: [
-      {
-        author: "Pierre Atépa Goudiaby",
-        role: "Architecte et Président du Club des Investisseurs Sénégalais",
-        quote: "ChantierSync m'a permis de suivre mes projets en temps réel, même en déplacement à l'étranger.",
-      },
-      {
-        author: "Fatou Diop",
-        role: "Directrice de projets BTP",
-        quote: "Une plateforme intuitive qui a réduit nos coûts et accéléré nos livraisons.",
-      },
-      {
-        author: "Moussa Traoré",
-        role: "Chef de chantier",
-        quote: "Mes rapports sont directement consultés au bureau sans attendre. Gain de temps énorme !",
-      },
-    ],
-  });
-
-  console.log("✅ Seeding terminé avec succès !");
+  console.log("✅ Seeding terminé !");
 }
 
 main()
