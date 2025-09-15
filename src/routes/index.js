@@ -12,10 +12,13 @@ import { getTestimonials, createTestimonial } from "../controllers/TestimonialCo
 import { createReport, getReports, upload } from "../controllers/ReportController.js";
 import { getDashboardStats } from "../controllers/DashboardController.js";
 import { getChantiers, createChantier } from "../controllers/ChantiersController.js";
+import tenantRequestRoutes from "./tenantRequestRoutes.js";
 
 import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
+
+router.use("/tenant-requests", tenantRequestRoutes);
 
 // --- Auth routes ---
 router.post("/auth/register", register);
