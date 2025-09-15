@@ -1,25 +1,18 @@
 import { Router } from "express";
-import { login, register } from "../controllers/auth.controller.js";
+
+// --- Controllers ---
+import { login, register } from "../controllers/AuthController.js";
 import {
   getAllContactMessages,
   deleteContactMessage,
 } from "../controllers/AdminMessageController.js";
-import { createContactMessage } from "../controllers/contactcontroller.js";
-import { getFeatures, createFeature } from "../controllers/featurecontroller.js";
-import {
-  getTestimonials,
-  createTestimonial,
-} from "../controllers/testimonialcontroller.js";
-import {
-  createReport,
-  getReports,
-  upload,
-} from "../controllers/reportcontroller.js";
-import { getDashboardStats } from "../controllers/dashboard.controller.js";
-import {
-  getChantiers,
-  createChantier,
-} from "../controllers/chantiers.controller.js";
+import { createContactMessage } from "../controllers/ContactController.js";
+import { getFeatures, createFeature } from "../controllers/FeatureController.js";
+import { getTestimonials, createTestimonial } from "../controllers/TestimonialController.js";
+import { createReport, getReports, upload } from "../controllers/ReportController.js";
+import { getDashboardStats } from "../controllers/DashboardController.js";
+import { getChantiers, createChantier } from "../controllers/ChantiersController.js";
+
 import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
