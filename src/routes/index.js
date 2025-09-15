@@ -9,15 +9,14 @@ import {
   updateChantier,
   deleteChantier,
 } from "../controllers/chantiers.controller.js";
-import { getRapports, createRapport } from "../controllers/rapports.controller.js";
-import { upload, createReport, getReports } from "../controllers/reportController.js";
+import { upload, createReport, getReports } from "../controllers/reportcontroller.js";
 import {
   getAllContactMessages,
   deleteContactMessage,
-} from "../controllers/adminMessageController.js";
-import { createContactMessage } from "../controllers/contactController.js";
-import { getFeatures, createFeature } from "../controllers/featureController.js";
-import { getTestimonials, createTestimonial } from "../controllers/testimonialController.js";
+} from "../controllers/adminmessagecontroller.js";
+import { createContactMessage } from "../controllers/contactcontroller.js";
+import { getFeatures, createFeature } from "../controllers/featurecontroller.js";
+import { getTestimonials, createTestimonial } from "../controllers/testimonialcontroller.js";
 
 const router = express.Router();
 
