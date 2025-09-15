@@ -1,4 +1,4 @@
-import { prisma } from "../prismaClient.js";
+import prisma from "../prismaClient.js";
 
 export const getChantiers = async (req, res) => {
   try {

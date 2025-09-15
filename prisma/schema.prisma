@@ -1,54 +1,42 @@
-// prisma/schema.prisma
+// ------------------------------------------------------
+// Datasource & Generator
+// ------------------------------------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
+// ------------------------------------------------------
+// Models
+// ------------------------------------------------------
 
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
   password  String
-  role      String    @default("admin") // admin, agent, superadmin
-  chantiers Chantier[]
+  fullName  String?
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+
+  // Relations
+  reports   Report[]
 }
 
-model Chantier {
-  id        Int       @id @default(autoincrement())
-  nom       String
-  adresse   String?
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  rapports  Rapport[]
-  createdAt DateTime  @default(now())
-}
-
-model Rapport {
-  id         Int       @id @default(autoincrement())
-  chantierId Int
-  chantier   Chantier  @relation(fields: [chantierId], references: [id])
-  imageUrl   String
+model Report {
+  id         Int      @id @default(autoincrement())
+  chantierId String
+  agentId    String
   latitude   Float?
   longitude  Float?
-  createdAt  DateTime  @default(now())
-}
+  imageUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 
-model Feature {
-  id        Int      @id @default(autoincrement())
-  title     String
-  description String
-  createdAt DateTime @default(now())
+  // Relations
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 }
-
-model Testimonial {
-  id        Int      @id @default(autoincrement())
-  author    String
-  role      String
-  quote     String
-  createdAt DateTime @default(now())
-}
-

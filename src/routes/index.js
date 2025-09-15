@@ -1,57 +1,62 @@
-import express from "express";
-
-// 🟢 Controllers (assure-toi que les fichiers existent avec ces noms)
-import { register, login } from "../controllers/auth.controller.js";
+import { Router } from "express";
+import { login, register } from "../controllers/auth.controller.js";
+import {
+  getAllContactMessages,
+  deleteContactMessage,
+} from "../controllers/AdminMessageController.js";
+import { createContactMessage } from "../controllers/contactcontroller.js";
+import { getFeatures, createFeature } from "../controllers/featurecontroller.js";
+import {
+  getTestimonials,
+  createTestimonial,
+} from "../controllers/testimonialcontroller.js";
+import {
+  createReport,
+  getReports,
+  upload,
+} from "../controllers/reportcontroller.js";
 import { getDashboardStats } from "../controllers/dashboard.controller.js";
 import {
   getChantiers,
   createChantier,
-  updateChantier,
-  deleteChantier,
 } from "../controllers/chantiers.controller.js";
-import { upload, createReport, getReports } from "../controllers/reportcontroller.js";
-import {
-  getAllContactMessages,
-  deleteContactMessage,
-} from "../controllers/adminmessagecontroller.js";
-import { createContactMessage } from "../controllers/contactcontroller.js";
-import { getFeatures, createFeature } from "../controllers/featurecontroller.js";
-import { getTestimonials, createTestimonial } from "../controllers/testimonialcontroller.js";
+import { requireAuth } from "../middleware/auth.js";
 
-const router = express.Router();
+const router = Router();
 
-// 🔑 Auth
-router.post("/register", register);
-router.post("/login", login);
+// --- Auth routes ---
+router.post("/auth/register", register);
+router.post("/auth/login", login);
 
-// 📊 Dashboard
-router.get("/dashboard-stats", getDashboardStats);
-
-// 🏗️ Chantiers CRUD
-router.get("/chantiers", getChantiers);
-router.post("/chantiers", createChantier);
-router.put("/chantiers/:id", updateChantier);
-router.delete("/chantiers/:id", deleteChantier);
-
-// 📝 Rapports liés à chantiers
-router.get("/rapports", getRapports);
-router.post("/rapports", createRapport);
-
-// 📷 Reports (avec upload image)
-router.post("/reports", upload.single("image"), createReport);
-router.get("/reports", getReports);
-
-// 📩 Contact + messages admin
+// --- Contact routes ---
 router.post("/contact", createContactMessage);
+
+// --- Admin message routes ---
 router.get("/admin/messages", getAllContactMessages);
 router.delete("/admin/messages/:id", deleteContactMessage);
 
-// ⭐ Features
+// --- Feature routes ---
 router.get("/features", getFeatures);
 router.post("/features", createFeature);
 
-// 🗨️ Testimonials
+// --- Testimonial routes ---
 router.get("/testimonials", getTestimonials);
 router.post("/testimonials", createTestimonial);
+
+// --- Report routes ---
+router.post("/reports", requireAuth, upload.single("image"), createReport);
+router.get("/reports", requireAuth, getReports);
+
+// --- Dashboard stats ---
+router.get("/dashboard-stats", getDashboardStats);
+
+// --- Chantiers ---
+router.get("/chantiers", getChantiers);
+router.post("/chantiers", createChantier);
+
+// --- Health check ---
+router.get("/ping", (req, res) => {
+  res.json({ message: "pong" });
+});
 
 export default router;
