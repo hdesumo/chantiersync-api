@@ -7,30 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  fullName  String?   // ✅ rendu optionnel pour éviter l'erreur de migration
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  reports   Report[]
-}
-
-model Report {
-  id         Int      @id @default(autoincrement())
-  chantierId Int
-  imageUrl   String
-  latitude   Float
-  longitude  Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  user   User?   @relation(fields: [userId], references: [id])
-  userId Int?
-}
-
 model TenantRequest {
   id         Int      @id @default(autoincrement())
   nom        String
@@ -38,4 +14,43 @@ model TenantRequest {
   entreprise String
   telephone  String
   createdAt  DateTime @default(now())
+
+  @@map("TenantRequest")
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  latitude   Float
+  longitude  Float
+  imageUrl   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  userId     Int?
+  chantierId Int
+  User       User?    @relation(fields: [userId], references: [id])
+
+  @@map("Report")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  fullName  String?
+  updatedAt DateTime
+  Report    Report[]
+
+  @@map("User")
+}
+
+model Trial {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  email     String    @db.VarChar(255)
+  company   String?   @db.VarChar(255)
+  phone     String?   @db.VarChar(50)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+
+  @@map("Trial")
 }
