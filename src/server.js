@@ -13,15 +13,15 @@ const app = express();
    ========================= */
 app.use(cors({
   origin: [
-    "https://www.chantiersync.com",           // ton domaine principal
-    "https://chantiersync-portal.vercel.app"  // domaine Vercel (staging)
+    "https://www.chantiersync.com",
+    "https://chantiersync-portal.vercel.app"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
 app.use(express.json());
-app.use(morgan("dev")); // logs HTTP
+app.use(morgan("dev"));
 
 /* =========================
    📌 Routes
