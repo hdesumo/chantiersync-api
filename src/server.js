@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import prisma from "./prismaClient.js";
 import router from "./routes/index.js";
+import tenantRequestRoutes from "./routes/tenantRequestRoutes.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(morgan("dev")); // logs HTTP
    📌 Routes
 =========================== */
 app.use("/", router);
+app.use("/api/tenant-requests", tenantRequestRoutes);
 
 /* ===========================
    ❌ Gestion 404

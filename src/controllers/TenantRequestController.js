@@ -1,4 +1,3 @@
-// src/controllers/TenantRequestController.js
 import prisma from "../prismaClient.js";
 
 export const TenantRequestController = {
