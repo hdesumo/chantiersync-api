@@ -1,8 +1,13 @@
+// src/routes/tenantRequestRoutes.js
 import { Router } from "express";
-import { createTenantRequest } from "../controllers/TenantRequestController.js";
+import { TenantRequestController } from "../controllers/TenantRequestController.js";
 
 const router = Router();
 
-router.post("/", createTenantRequest);
+// ✅ Créer une nouvelle demande d’essai
+router.post("/", TenantRequestController.create);
+
+// ✅ Récupérer toutes les demandes
+router.get("/", TenantRequestController.getAll);
 
 export default router;
