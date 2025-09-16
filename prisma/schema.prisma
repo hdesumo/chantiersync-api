@@ -7,50 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TenantRequest {
-  id         Int      @id @default(autoincrement())
-  nom        String
-  email      String   @unique
-  entreprise String
-  telephone  String
-  createdAt  DateTime @default(now())
-
-  @@map("TenantRequest")
+model User {
+  id        Int      @id @default(autoincrement())
+  fullname  String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }
 
 model Report {
   id         Int      @id @default(autoincrement())
+  chantierId Int
+  imageUrl   String
   latitude   Float
   longitude  Float
-  imageUrl   String
   createdAt  DateTime @default(now())
-  updatedAt  DateTime
-  userId     Int?
-  chantierId Int
-  User       User?    @relation(fields: [userId], references: [id])
-
-  @@map("Report")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  fullName  String?
-  updatedAt DateTime
-  Report    Report[]
-
-  @@map("User")
+model TenantRequest {
+  id          Int      @id @default(autoincrement())
+  companyName String
+  contactName String
+  email       String
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
 }
 
 model Trial {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(255)
-  email     String    @db.VarChar(255)
-  company   String?   @db.VarChar(255)
-  phone     String?   @db.VarChar(50)
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  company   String?
+  phone     String?
+  createdAt DateTime @default(now())
+}
 
-  @@map("Trial")
+model Affiliate {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  company   String?
+  phone     String?
+  createdAt DateTime @default(now())
 }
