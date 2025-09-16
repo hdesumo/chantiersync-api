@@ -1,66 +1,54 @@
-import { PrismaClient } from "@prisma/client";
+// src/controllers/TenantRequestController.js
+import prisma from "../prismaClient.js";
 
-const prisma = new PrismaClient();
+export const TenantRequestController = {
+  async create(req, res) {
+    try {
+      const { nom, email, entreprise, telephone } = req.body;
 
-/**
- * @desc Créer une nouvelle demande d'essai (TenantRequest)
- * @route POST /tenant-requests
- * @access Public
- */
-export const createTenantRequest = async (req, res) => {
-  try {
-    const { nom, email, entreprise, telephone } = req.body;
+      // ✅ Validation côté backend
+      if (!nom || nom.trim().length < 2) {
+        return res.status(400).json({ error: "Le nom est requis et doit contenir au moins 2 caractères." });
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Email invalide." });
+      }
+      if (!entreprise || entreprise.trim().length < 2) {
+        return res.status(400).json({ error: "Le nom de l'entreprise est requis." });
+      }
+      if (!telephone || !/^[0-9]{6,15}$/.test(telephone)) {
+        return res.status(400).json({ error: "Le téléphone doit contenir uniquement des chiffres (6 à 15)." });
+      }
 
-    if (!nom || !email || !entreprise || !telephone) {
-      return res
-        .status(400)
-        .json({ message: "❌ Tous les champs (nom, email, entreprise, téléphone) sont requis." });
+      // Vérifier si l'email existe déjà
+      const existing = await prisma.tenantRequest.findUnique({
+        where: { email },
+      });
+      if (existing) {
+        return res.status(409).json({ error: "Une demande existe déjà avec cet email." });
+      }
+
+      // Créer la demande
+      const newRequest = await prisma.tenantRequest.create({
+        data: { nom, email, entreprise, telephone },
+      });
+
+      return res.status(201).json(newRequest);
+    } catch (error) {
+      console.error("❌ Erreur création tenant request:", error);
+      return res.status(500).json({ error: "Erreur serveur." });
     }
+  },
 
-    // Vérifier doublon manuellement
-    const existing = await prisma.tenantRequest.findUnique({
-      where: { email },
-    });
-
-    if (existing) {
-      return res
-        .status(409)
-        .json({ message: "⚠️ Une demande existe déjà avec cet email." });
+  async getAll(req, res) {
+    try {
+      const requests = await prisma.tenantRequest.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+      return res.json(requests);
+    } catch (error) {
+      console.error("❌ Erreur récupération tenant requests:", error);
+      return res.status(500).json({ error: "Erreur serveur." });
     }
-
-    const newRequest = await prisma.tenantRequest.create({
-      data: { nom, email, entreprise, telephone },
-    });
-
-    return res.status(201).json({
-      message: "✅ Votre demande a bien été enregistrée.",
-      request: newRequest,
-    });
-  } catch (error) {
-    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-      return res
-        .status(409)
-        .json({ message: "⚠️ Une demande existe déjà avec cet email." });
-    }
-
-    console.error("Erreur création demande :", error);
-    return res.status(500).json({ message: "Erreur serveur." });
-  }
-};
-
-/**
- * @desc Lister toutes les demandes (admin)
- * @route GET /tenant-requests
- * @access Private (Admin)
- */
-export const getTenantRequests = async (req, res) => {
-  try {
-    const requests = await prisma.tenantRequest.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return res.json(requests);
-  } catch (error) {
-    console.error("Erreur récupération demandes :", error);
-    return res.status(500).json({ message: "Erreur serveur." });
-  }
+  },
 };
