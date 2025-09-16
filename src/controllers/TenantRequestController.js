@@ -11,25 +11,23 @@ export const createTenantRequest = async (req, res) => {
   try {
     const { nom, email, entreprise, telephone } = req.body;
 
-    // Validation simple
     if (!nom || !email || !entreprise || !telephone) {
       return res
         .status(400)
         .json({ message: "❌ Tous les champs (nom, email, entreprise, téléphone) sont requis." });
     }
 
-    // Vérifier si un email existe déjà
+    // Vérifier doublon manuellement
     const existing = await prisma.tenantRequest.findUnique({
       where: { email },
     });
 
     if (existing) {
       return res
-        .status(400)
-        .json({ message: "❌ Une demande existe déjà avec cet email." });
+        .status(409)
+        .json({ message: "⚠️ Une demande existe déjà avec cet email." });
     }
 
-    // Créer une nouvelle demande
     const newRequest = await prisma.tenantRequest.create({
       data: { nom, email, entreprise, telephone },
     });
@@ -39,6 +37,12 @@ export const createTenantRequest = async (req, res) => {
       request: newRequest,
     });
   } catch (error) {
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return res
+        .status(409)
+        .json({ message: "⚠️ Une demande existe déjà avec cet email." });
+    }
+
     console.error("Erreur création demande :", error);
     return res.status(500).json({ message: "Erreur serveur." });
   }
