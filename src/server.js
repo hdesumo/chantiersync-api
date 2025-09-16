@@ -9,10 +9,13 @@ import trialRoutes from "./routes/trialRoutes.js";
 const app = express();
 
 /* =========================
-   🌍 CORS (temporaire permissif)
+   🌍 CORS (restreint final)
    ========================= */
 app.use(cors({
-  origin: "*",
+  origin: [
+    "https://www.chantiersync.com",          // domaine principal
+    "https://chantiersync-portal.vercel.app" // domaine Vercel (staging)
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -38,8 +41,8 @@ app.use((req, res, next) => {
    ⚠️ Gestion erreurs globales
    ========================= */
 app.use((err, req, res, next) => {
-  console.error("❌ Erreur serveur:", err.stack);
-  res.status(500).json({ error: "Erreur interne du serveur" });
+  console.error("❌ Erreur serveur:", err.message);
+  res.status(500).json({ error: err.message || "Erreur interne du serveur" });
 });
 
 /* =========================
