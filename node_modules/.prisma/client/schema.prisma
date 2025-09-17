@@ -7,46 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  fullname  String?
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+model Affiliate {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  company   String?   @db.VarChar(255)
+  phone     String?   @db.VarChar(50)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+
+  @@map("Affiliate")
 }
 
 model Report {
   id         Int      @id @default(autoincrement())
-  chantierId Int
-  imageUrl   String
   latitude   Float
   longitude  Float
+  imageUrl   String
   createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  userId     Int?
+  chantierId Int
+  User       User?    @relation(fields: [userId], references: [id])
 }
 
 model TenantRequest {
-  id          Int      @id @default(autoincrement())
-  companyName String
-  contactName String
-  email       String
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  nom        String
+  email      String   @unique
+  entreprise String
+  telephone  String
+  createdAt  DateTime @default(now())
 }
 
 model Trial {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String
-  company   String?
-  phone     String?
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  email     String    @db.VarChar(255)
+  company   String?   @db.VarChar(255)
+  phone     String?   @db.VarChar(50)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
 }
 
-model Affiliate {
+model User {
   id        Int      @id @default(autoincrement())
-  name      String
   email     String   @unique
-  company   String?
-  phone     String?
+  password  String
   createdAt DateTime @default(now())
+  fullName  String?
+  updatedAt DateTime
+  Report    Report[]
 }
