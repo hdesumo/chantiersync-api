@@ -3,36 +3,45 @@ import prisma from "../prismaClient.js";
 
 const router = express.Router();
 
-// POST : Nouvelle demande d’affiliation
+// ➡️ POST /api/affiliates
 router.post("/", async (req, res) => {
+  console.log("🔍 [DEBUG][POST /api/affiliates] Requête reçue avec body:", req.body);
+
   try {
     const { name, email, company, phone } = req.body;
 
     if (!name || !email) {
-      return res.status(400).json({ error: "Nom et email sont obligatoires" });
+      console.warn("⚠️ [DEBUG] Champs manquants:", { name, email });
+      return res.status(400).json({ error: "Nom et email sont obligatoires." });
     }
 
-    const affiliate = await prisma.affiliate.create({
+    const newAffiliate = await prisma.affiliate.create({
       data: { name, email, company, phone },
     });
 
-    res.status(201).json(affiliate);
-  } catch (err) {
-    console.error("Erreur création affiliation:", err);
-    res.status(500).json({ error: "Erreur interne du serveur" });
+    console.log("✅ [DEBUG] Partenaire créé:", newAffiliate);
+
+    res.json(newAffiliate);
+  } catch (error) {
+    console.error("❌ [DEBUG][POST /api/affiliates] Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-// GET : Liste des affiliés (utile pour SuperAdmin)
+// ➡️ GET /api/affiliates
 router.get("/", async (req, res) => {
+  console.log("🔍 [DEBUG][GET /api/affiliates] Récupération de tous les partenaires...");
+
   try {
     const affiliates = await prisma.affiliate.findMany({
       orderBy: { createdAt: "desc" },
     });
+
+    console.log(`✅ [DEBUG] ${affiliates.length} partenaires trouvés`);
     res.json(affiliates);
-  } catch (err) {
-    console.error("Erreur récupération affiliations:", err);
-    res.status(500).json({ error: "Erreur interne du serveur" });
+  } catch (error) {
+    console.error("❌ [DEBUG][GET /api/affiliates] Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
